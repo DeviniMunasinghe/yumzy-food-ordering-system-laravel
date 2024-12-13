@@ -18,24 +18,33 @@ class RegisteredUserController extends Controller
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function store(Request $request): Response
+    public function store(Request $request)
     {
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'username' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->string('password')),
+        // Check if the user already exists (should already be handled by the 'unique' rule)
+    $user = User::where('email', $request->email)->first();
+    if ($user) {
+        return response()->json([
+            'message' => 'User with this email already exists.'
+        ], 400); // Bad request if user exists
+    }
+
+    $user = User::create([
+        'username' => $request->username,
+        'email' => $request->email,
+        'password' => Hash::make($request->password),
+    ]);
+
+    event(new Registered($user));
+
+
+        return response()->json([
+            'message'=>'User registered successfully'
         ]);
-
-        event(new Registered($user));
-
-        Auth::login($user);
-
-        return response()->noContent();
     }
 }
