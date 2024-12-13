@@ -2,24 +2,44 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Models\User;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Auth\LoginRequest;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 
 class AuthenticatedSessionController extends Controller
 {
     /**
      * Handle an incoming authentication request.
      */
-    public function store(LoginRequest $request): Response
+    public function store(Request $request)
     {
-        $request->authenticate();
+        //validate the request
+        $request->validate([
+            'email'=>'required|email',
+            'password'=>'required',
+        ]);
 
-        $request->session()->regenerate();
+        //check if the user exits
+        $user=User::where('email',$request->email)->first();
 
-        return response()->noContent();
+        //if user not found or password doesn't match
+        if(!$user || !Hash::check($request->password, $user->password)){
+            throw ValidationException::withMessages([
+                'email'=>['The provided credentials are incorrect'],
+            ]);
+        }
+
+        //create a token for the user using sanctum
+        $token=$user->createToken('yumzy')->plainTextToken;
+
+        //return the token in the response
+        return response()->json([
+            'access_token'=>$token,
+            'token_type'=>'Bearer',
+        ]);
     }
 
     /**
@@ -27,12 +47,12 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): Response
     {
-        Auth::guard('web')->logout();
+        //remove the user's token(Logout)
+        $request->user()->currentAccessToken()->delete();
 
-        $request->session()->invalidate();
+        return response()->json([
+            'message'=>'Logged out successfully',
+        ]);
 
-        $request->session()->regenerateToken();
-
-        return response()->noContent();
     }
 }
