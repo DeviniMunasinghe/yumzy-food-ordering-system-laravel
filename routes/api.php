@@ -20,7 +20,7 @@ Route::middleware('api')->post('/forgot-password', [PasswordResetLinkController:
     ->name('password.email');
 
 Route::middleware('api')->post('/reset-password', [NewPasswordController::class, 'store'])
-    ->name('password.store');
+    ->name('password.update');
 
 // Ensure this route is under 'auth:sanctum' middleware if you need token-based authentication
 Route::middleware(['auth:sanctum'])->get('/verify-email/{id}/{hash}', VerifyEmailController::class)
