@@ -47,4 +47,9 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function sendPasswordResetNotification($url)
+    {
+        $this->notify(new \App\Notifications\CustomPasswordResetNotification($url));
+    }
 }
