@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 // All API routes should be within the 'api' middleware group to avoid CSRF issues
 
@@ -23,8 +24,14 @@ Route::middleware('api')->post('/reset-password', [NewPasswordController::class,
     ->name('password.update');
 
 // Ensure this route is under 'auth:sanctum' middleware if you need token-based authentication
-Route::middleware(['auth:sanctum'])->get('/verify-email/{id}/{hash}', VerifyEmailController::class)
-    ->name('verification.verify');
+/*Route::middleware(['auth:sanctum'])->get('/verify-email/{id}/{hash}', VerifyEmailController::class)
+    ->name('verification.verify');*/
+
+    Route::middleware(['auth:sanctum', 'signed'])->get('/verify-email/{id}/{hash}', function (EmailVerificationRequest $request) {
+        $request->fulfill();
+    
+        return response()->json(['message' => 'Email verified successfully.']);
+    })->name('verification.verify');
 
 Route::middleware(['auth:sanctum'])->post('/email/verification-notification', [EmailVerificationNotificationController::class, 'store'])
     ->name('verification.send');
