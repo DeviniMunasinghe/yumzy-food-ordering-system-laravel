@@ -6,14 +6,11 @@ use App\Models\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 
 class AuthenticatedSessionController extends Controller
 {
-    /**
-     * Handle an incoming authentication request.
-     */
+    //Handle an incoming authentication request.
     public function store(Request $request)
     {
         //validate the request
@@ -43,9 +40,7 @@ class AuthenticatedSessionController extends Controller
         ]);
     }
 
-    /**
-     * Destroy an authenticated session.
-     */
+    //Destroy an authenticated session.
     public function destroy(Request $request)
     {
         //remove the user's token(Logout)
