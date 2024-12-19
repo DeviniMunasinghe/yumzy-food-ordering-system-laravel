@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 Use App\Http\Controllers\ItemController;
+use Illuminate\Support\Facades\Log; 
 
 // Include authentication routes
 Route::prefix('auth')->group(function () {
