@@ -55,7 +55,6 @@ class Kernel extends HttpKernel
     protected $routeMiddleware = [
         'auth' => \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
         'auth:sanctum' => \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
-        'role' => \App\Http\Middleware\RoleMiddleware::class,  // Add this line
-        // Other middleware...
+        'role' => \App\Http\Middleware\RoleMiddleware::class, 
     ];
 }
