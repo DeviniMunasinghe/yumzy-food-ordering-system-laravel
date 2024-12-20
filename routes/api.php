@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 Use App\Http\Controllers\ItemController;
-use Illuminate\Support\Facades\Log; 
 
 // Include authentication routes
 Route::prefix('auth')->group(function () {
@@ -13,6 +12,6 @@ Route::get('/status', function () {
     return response()->json(['status' => 'API is running'], 200);
 });
 
-Route::middleware(['auth:sanctum', 'role:admin,super_admin'])->group(function () {
+Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/add-item', [ItemController::class, 'store']);
 });
