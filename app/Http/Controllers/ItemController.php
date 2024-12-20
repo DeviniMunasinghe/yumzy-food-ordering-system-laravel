@@ -101,4 +101,31 @@ class ItemController extends Controller
         ],200);
 
     }
+
+    public function delete($id){
+        //check if the user is authenticated and has the correct role
+        if(!Auth::check()||!(Auth::user()->role=='admin'||Auth::user()->role=='super_admin')){
+            return response()->json([
+                'message'=>'Forbidden'
+            ],403);
+        }
+
+        //find the item by id and ensure it exists
+        $item=Item::find($id);
+
+        if(!$item){
+            return response()->json([
+                'message'=>'Item not found'
+            ],404);
+        }
+
+        //set the item as deleted
+        $item->is_deleted=true;
+        $item->save();
+
+        return response()->json([
+            'message' => 'Item marked as deleted successfully',
+            'item' => $item
+        ], 200);
+    }
 }

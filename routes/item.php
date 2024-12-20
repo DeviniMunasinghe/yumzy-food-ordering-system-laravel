@@ -17,3 +17,8 @@ Route::middleware(['auth:sanctum'])->group(function(){
 Route::middleware(['auth:sanctum'])->group(function(){
     Route::get('/get-item/{id}',[ItemController::class,'show']);
 });
+
+//delete a specific item by id
+Route::middleware(['auth:sanctum'])->group(function(){
+    Route::delete('/delete-item/{id}',[ItemController::class,'delete']);
+});
