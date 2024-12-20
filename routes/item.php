@@ -22,3 +22,8 @@ Route::middleware(['auth:sanctum'])->group(function(){
 Route::middleware(['auth:sanctum'])->group(function(){
     Route::delete('/delete-item/{id}',[ItemController::class,'delete']);
 });
+
+//update a specific item by id
+Route::middleware(['auth:sanctum'])->group(function(){
+    Route::put('/update-item/{id}',[ItemController::class,'update']);
+});

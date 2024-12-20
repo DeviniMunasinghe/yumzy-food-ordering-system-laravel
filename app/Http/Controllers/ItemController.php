@@ -128,4 +128,70 @@ class ItemController extends Controller
             'item' => $item
         ], 200);
     }
+
+    public function update(Request $request, $id){
+
+         // Check if the user is authenticated and has the correct role
+         if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+
+        //validate the request data
+        $validator=Validator::make($request->all(),[
+            'item_name'=>'nullable|string|max:255',
+            'item_description' => 'nullable|string',
+            'item_price' => 'nullable|numeric|min:0',
+            'item_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'category_name' => 'nullable|string|exists:categories,category_name',
+        ]);
+
+        if ($validator->fails()){
+            return response()->json([
+                'errors'=>$validator->errors()
+            ],422);
+        }
+
+        //find the item by id
+        $item=Item::find($id);
+
+        if(!$item){
+            return response()->json([
+                'message'=>'Item not found'
+            ],404);
+        }
+
+        //if a new image is uploaded store it and update the path
+        if ($request->hasFile('item_image')) {
+            $imagePath = $request->file('item_image')->store('item_images', 'public');
+            $item->item_image = $imagePath;
+        }
+
+        // Update the other fields if provided in the request
+        if ($request->has('item_name')) {
+            $item->item_name = $request->item_name;
+        }
+
+        if ($request->has('item_description')) {
+            $item->item_description = $request->item_description;
+        }
+
+        if ($request->has('item_price')) {
+            $item->item_price = $request->item_price;
+        }
+
+        if ($request->has('category_name')) {
+            $category = Category::where('category_name', $request->category_name)->first();
+            if ($category) {
+                $item->category_id = $category->id;
+            }
+        }
+
+        // Save the updated item
+        $item->save();
+
+        return response()->json([
+            'message' => 'Item updated successfully',
+            'item' => $item
+        ], 200);
+    }
 }
