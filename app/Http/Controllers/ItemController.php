@@ -56,4 +56,22 @@ class ItemController extends Controller
         ], 201);
 
     }
+
+    public function index(){
+
+       // Check if the user is authenticated and has the correct role
+    if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
+        return response()->json(['message' => 'Forbidden'], 403);
+    }
+    
+    //fetch all items where is_deleted=0
+    $items=Item::where('is_deleted',false)
+    ->with('category')
+    ->get();
+
+    return response()->json([
+        'message'=>'Item retrieved successfully',
+        'items'=>$items
+    ],200);
+    }
 }
