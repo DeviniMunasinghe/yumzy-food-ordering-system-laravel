@@ -74,4 +74,31 @@ class ItemController extends Controller
         'items'=>$items
     ],200);
     }
+
+    public function show($id){
+        //check if the user is authenticated and has the correct role
+        if(!Auth::check()||!(Auth::user()->role=='admin'||Auth::user()->role=='super_admin')){
+            return response()->json([
+                'message'=>'Forbidden'
+            ],403);
+        }
+
+        //find the item by id and ensure it is not deleted
+        $item=Item::where('id',$id)
+        ->where('is_deleted',false)
+        ->with('category')
+        ->first();
+
+        if(!$item){
+            return response()->json([
+                'message'=>'Item not found'
+            ],404);
+        }
+
+        return response()->json([
+            'message'=>'Item retrieved successfully',
+            'item'=>$item
+        ],200);
+
+    }
 }
