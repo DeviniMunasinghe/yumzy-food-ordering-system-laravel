@@ -12,3 +12,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
 Route::middleware(['auth:sanctum'])->group(function(){
     Route::get('/get-all',[ItemController::class,'index']);
 });
+
+//get a specific item
+Route::middleware(['auth:sanctum'])->group(function(){
+    Route::get('/get-item/{id}',[ItemController::class,'show']);
+});
