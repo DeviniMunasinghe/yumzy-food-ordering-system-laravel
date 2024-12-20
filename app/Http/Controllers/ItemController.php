@@ -194,4 +194,26 @@ class ItemController extends Controller
             'item' => $item
         ], 200);
     }
+
+    public function getItemsByCategory($category_name){
+
+        //Find the category by name
+        $category=Category::where('category_name',$category_name)->first();
+
+        if(!$category){
+            return response()->json([
+                'message'=>'Category Not Found'
+            ],404);
+        }
+
+        //Fetch items where is_deleted=0 for the given category
+        $items=Item::where('category_id',$category->id)
+        ->where('is_deleted',false)
+        ->get();
+
+        return response()->json([
+            'message'=>'Items retrieved successfully',
+            'items'=>$items
+        ],200);
+    }
 }
