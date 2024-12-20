@@ -27,3 +27,6 @@ Route::middleware(['auth:sanctum'])->group(function(){
 Route::middleware(['auth:sanctum'])->group(function(){
     Route::put('/update-item/{id}',[ItemController::class,'update']);
 });
+
+//get items by category
+Route::get('/category/{category_name}', [ItemController::class, 'getItemsByCategory']);
