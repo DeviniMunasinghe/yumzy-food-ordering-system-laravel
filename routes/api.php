@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-Use App\Http\Controllers\ItemController;
+use App\Http\Controllers\ItemController;
 
 // Include authentication routes
 Route::prefix('auth')->group(function () {
