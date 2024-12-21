@@ -57,70 +57,73 @@ class ItemController extends Controller
 
     }
 
-    public function index(){
+    public function index()
+    {
 
-       // Check if the user is authenticated and has the correct role
-    if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
-        return response()->json(['message' => 'Forbidden'], 403);
+        // Check if the user is authenticated and has the correct role
+        if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+
+        //fetch all items where is_deleted=0
+        $items = Item::where('is_deleted', false)
+            ->with('category')
+            ->get();
+
+        return response()->json([
+            'message' => 'Item retrieved successfully',
+            'items' => $items
+        ], 200);
     }
-    
-    //fetch all items where is_deleted=0
-    $items=Item::where('is_deleted',false)
-    ->with('category')
-    ->get();
 
-    return response()->json([
-        'message'=>'Item retrieved successfully',
-        'items'=>$items
-    ],200);
-    }
-
-    public function show($id){
+    public function show($id)
+    {
         //check if the user is authenticated and has the correct role
-        if(!Auth::check()||!(Auth::user()->role=='admin'||Auth::user()->role=='super_admin')){
+        if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
             return response()->json([
-                'message'=>'Forbidden'
-            ],403);
+                'message' => 'Forbidden'
+            ], 403);
         }
 
         //find the item by id and ensure it is not deleted
-        $item=Item::where('id',$id)
-        ->where('is_deleted',false)
-        ->with('category')
-        ->first();
+        $item = Item::where('id', $id)
+            ->where('is_deleted', false)
+            ->with('category')
+            ->first();
 
-        if(!$item){
+        if (!$item) {
             return response()->json([
-                'message'=>'Item not found'
-            ],404);
+                'message' => 'Item not found'
+            ], 404);
         }
 
         return response()->json([
-            'message'=>'Item retrieved successfully',
-            'item'=>$item
-        ],200);
+            'message' => 'Item retrieved successfully',
+            'item' => $item
+        ], 200);
 
     }
 
-    public function delete($id){
+    public function delete($id)
+    {
         //check if the user is authenticated and has the correct role
-        if(!Auth::check()||!(Auth::user()->role=='admin'||Auth::user()->role=='super_admin')){
+        if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
             return response()->json([
-                'message'=>'Forbidden'
-            ],403);
+                'message' => 'Forbidden'
+            ], 403);
         }
 
         //find the item by id and ensure it exists
-        $item=Item::find($id);
+        $item = Item::find($id);
 
-        if(!$item){
+        if (!$item) {
             return response()->json([
-                'message'=>'Item not found'
-            ],404);
+                'message' => 'Item not found'
+            ], 404);
         }
 
         //set the item as deleted
-        $item->is_deleted=true;
+        $item->is_deleted = true;
         $item->save();
 
         return response()->json([
@@ -129,35 +132,36 @@ class ItemController extends Controller
         ], 200);
     }
 
-    public function update(Request $request, $id){
+    public function update(Request $request, $id)
+    {
 
-         // Check if the user is authenticated and has the correct role
-         if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
+        // Check if the user is authenticated and has the correct role
+        if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
             return response()->json(['message' => 'Forbidden'], 403);
         }
 
         //validate the request data
-        $validator=Validator::make($request->all(),[
-            'item_name'=>'nullable|string|max:255',
+        $validator = Validator::make($request->all(), [
+            'item_name' => 'nullable|string|max:255',
             'item_description' => 'nullable|string',
             'item_price' => 'nullable|numeric|min:0',
             'item_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'category_name' => 'nullable|string|exists:categories,category_name',
         ]);
 
-        if ($validator->fails()){
+        if ($validator->fails()) {
             return response()->json([
-                'errors'=>$validator->errors()
-            ],422);
+                'errors' => $validator->errors()
+            ], 422);
         }
 
         //find the item by id
-        $item=Item::find($id);
+        $item = Item::find($id);
 
-        if(!$item){
+        if (!$item) {
             return response()->json([
-                'message'=>'Item not found'
-            ],404);
+                'message' => 'Item not found'
+            ], 404);
         }
 
         //if a new image is uploaded store it and update the path
@@ -195,25 +199,26 @@ class ItemController extends Controller
         ], 200);
     }
 
-    public function getItemsByCategory($category_name){
+    public function getItemsByCategory($category_name)
+    {
 
         //Find the category by name
-        $category=Category::where('category_name',$category_name)->first();
+        $category = Category::where('category_name', $category_name)->first();
 
-        if(!$category){
+        if (!$category) {
             return response()->json([
-                'message'=>'Category Not Found'
-            ],404);
+                'message' => 'Category Not Found'
+            ], 404);
         }
 
         //Fetch items where is_deleted=0 for the given category
-        $items=Item::where('category_id',$category->id)
-        ->where('is_deleted',false)
-        ->get();
+        $items = Item::where('category_id', $category->id)
+            ->where('is_deleted', false)
+            ->get();
 
         return response()->json([
-            'message'=>'Items retrieved successfully',
-            'items'=>$items
-        ],200);
+            'message' => 'Items retrieved successfully',
+            'items' => $items
+        ], 200);
     }
 }
