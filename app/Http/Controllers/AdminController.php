@@ -105,4 +105,34 @@ class AdminController extends Controller
         ],200);
 
     }
+
+    public function getAdminById($id){
+         // Check if the user is authenticated and has the correct role
+         if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
+         return response()->json(['message' => 'Forbidden'], 403);
+         }
+
+         //Find the admin by Id
+         $admin=User::where('id',$id)->where('role','admin')->where('is_deleted',false)->first();
+
+         if (!$admin) {
+            return response()->json(['message' => 'Admin not found'], 404);
+        }
+
+        // Return the admin details
+    return response()->json([
+        'message' => 'Admin retrieved successfully',
+        'admin' => [
+            'id' => $admin->id,
+            'username' => $admin->username,
+            'email' => $admin->email,
+            'role' => $admin->role,
+            'first_name' => $admin->first_name,
+            'last_name' => $admin->last_name,
+            'phone_no' => $admin->phone_no,
+            'address' => $admin->address,
+            'user_image' => $admin->user_image,
+        ]
+    ], 200);
+    }
 }
