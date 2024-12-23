@@ -86,4 +86,23 @@ class AdminController extends Controller
             'message'=>'Admin delted successfully',
         ],201);
     }
+
+    public function getAllAdmins(){
+
+        // Check if the user is authenticated and has the correct role
+        if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+
+        //Fetch all admins where is_deleted is false
+        $admins=User::whereIn('role',['admin','super_admin'])
+        ->where('is_deleted',false)
+        ->get(['id','username','email','role','first_name','last_name','address','phone_no','address','user_image']);
+
+        return response()->json([
+            'message'=>'Admin retrieved succesfully',
+            'admin'=>$admins
+        ],200);
+
+    }
 }
