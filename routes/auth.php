@@ -40,3 +40,6 @@ Route::middleware(['auth:sanctum'])->post('/add-admin', [AdminController::class,
 
 //Route to delete an admin(only super admin can)
 Route::middleware(['auth:sanctum'])->delete('/delete-admin/{id}', [AdminController::class, 'deleteAdmin'])->name('admin.delete');
+
+//Route to get all admins(only super admin and admin can)
+Route::middleware(['auth:sanctum'])->get('/get-all-admins', [AdminController::class, 'getAllAdmins'])->name('admin.get');
