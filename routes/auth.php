@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
@@ -33,3 +34,6 @@ Route::middleware(['auth:sanctum'])->post('/email/verification-notification', [E
 // route to handle authenticated user logout(using 'auth:sanctum' middleware)
 Route::middleware(['auth:sanctum'])->post('/logout', [AuthenticatedSessionController::class, 'destroy'])
     ->name('auth.logout');
+
+// Route to add a new admin (only accessible to super admin, using 'auth:sanctum' middleware)
+Route::middleware(['auth:sanctum'])->post('/add-admin', [AdminController::class, 'addAdmin'])->name('admin.add');
