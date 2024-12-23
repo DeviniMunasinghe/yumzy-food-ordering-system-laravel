@@ -37,3 +37,6 @@ Route::middleware(['auth:sanctum'])->post('/logout', [AuthenticatedSessionContro
 
 // Route to add a new admin (only accessible to super admin, using 'auth:sanctum' middleware)
 Route::middleware(['auth:sanctum'])->post('/add-admin', [AdminController::class, 'addAdmin'])->name('admin.add');
+
+//Route to delete an admin(only super admin can)
+Route::middleware(['auth:sanctum'])->delete('/delete-admin/{id}', [AdminController::class, 'deleteAdmin'])->name('admin.delete');

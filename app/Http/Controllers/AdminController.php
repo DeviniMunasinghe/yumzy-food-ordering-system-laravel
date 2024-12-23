@@ -62,4 +62,28 @@ class AdminController extends Controller
          ],201);
 
     }
+
+    public function deleteAdmin($id){
+         // Check if the authenticated user is a super admin
+         if (!Auth::check() || Auth::user()->role !== 'super_admin') {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+
+        //find the admin by id
+        $admin=User::where('id',$id)->where('role','admin')->first();
+
+        if(!$admin){
+            return response()->json([
+                'message'=>'Admin not found'
+            ],404);
+        }
+
+        //mark the admin as deleted
+        $admin->is_deleted=true;
+        $admin->save();
+
+        return response()->json([
+            'message'=>'Admin delted successfully',
+        ],201);
+    }
 }
