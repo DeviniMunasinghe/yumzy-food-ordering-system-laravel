@@ -22,7 +22,7 @@ class CartController extends Controller
             ],401);
         }
 
-        $user =Auth::check();
+        $user =Auth::user();
 
         //Check if the user already has a cart
         $cart = Cart::firstOrCreate(
