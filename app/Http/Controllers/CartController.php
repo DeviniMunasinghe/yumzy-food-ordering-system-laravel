@@ -128,4 +128,47 @@ class CartController extends Controller
             ], 201);
         }
     }
+
+
+    public function updateCartItemQuantity(Request $request){
+        $request->validate([
+            'item_id' => 'required|exists:items,id',
+            'quantity' => 'required|integer|min:1',
+        ]);
+    
+        if (!Auth::check()) {
+            return response()->json([
+                'message' => 'You must be logged in to update the cart item quantity.'
+            ], 401);
+        }
+    
+        $user = Auth::user();
+    
+        $cart = Cart::where('user_id', $user->id)->first();
+    
+        if (!$cart) {
+            return response()->json([
+                'message' => 'No cart found for this user.'
+            ], 404);
+        }
+    
+        $cartItem = CartItem::where('cart_id', $cart->id)
+            ->where('item_id', $request->item_id)
+            ->first();
+    
+        if (!$cartItem) {
+            return response()->json([
+                'message' => 'Item not found in the cart.'
+            ], 404);
+        }
+
+        //Update the quantity
+        $cartItem->quantity=$request->quantity;
+        $cartItem->save();
+
+        return response()->json([
+            'message'=>'Cart item quantity updated successfully',
+            'cartItem'=>$cartItem
+        ],200);
+    }
 }
