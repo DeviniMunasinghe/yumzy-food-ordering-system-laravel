@@ -12,4 +12,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     //remove cart items
     Route::delete('/remove-item', [CartController::class, 'removeFromCart']);
+
+    //update cart item quantity
+    Route::put('/update-quantity', [CartController::class, 'updateCartItemQuantity']);
 });
