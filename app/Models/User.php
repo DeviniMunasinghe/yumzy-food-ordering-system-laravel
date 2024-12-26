@@ -59,4 +59,9 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         $this->notify(new \App\Notifications\CustomPasswordResetNotification($url));
     }
+
+    public function cart()
+    {
+        return $this->hasOne(Cart::class);
+    }
 }

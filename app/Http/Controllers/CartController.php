@@ -36,8 +36,7 @@ class CartController extends Controller
             ->first();
 
         if ($cartItem) {
-            //update the quantity if it already exists
-            $cartItem->quantity += $request->quantity;
+            //update the quantity if it already exists`            $cartItem->quantity += $request->quantity;
             $cartItem->save();
         } else {
             //Add new item to the cart
@@ -170,5 +169,39 @@ class CartController extends Controller
             'message'=>'Cart item quantity updated successfully',
             'cartItem'=>$cartItem
         ],200);
+    }
+
+    public function selectItems(Request $request){
+        if (!auth()->check()) {
+            return response()->json([
+                'message' => 'You must be logged in to select cart items.'
+            ], 401);
+        }
+    
+        // Check if the user has a cart
+        $cart = $request->user()->cart;
+        
+        if (!$cart) {
+            return response()->json([
+                'message' => 'You do not have a cart.'
+            ], 400);
+        }
+        
+        $request->validate([
+            'cart_item_ids'=>'required|array',
+            'cart_item_ids.*'=>'exists:cart_items,id',
+        ]);
+
+        //Mark all cart items for the current user as not selected
+        CartItem::where('cart_id',$request->user()->cart->id)
+        ->update(['selected'=>false]);
+
+        //update selected status for the provided cart items
+        CartItem::whereIn('id',$request->cart_item_ids)
+        ->update(['selected'=>true]);
+
+        return response()->json([
+            'message'=>'Items selected successfully'
+        ],201);
     }
 }

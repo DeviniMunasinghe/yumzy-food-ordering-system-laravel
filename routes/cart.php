@@ -15,4 +15,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     //update cart item quantity
     Route::put('/update-quantity', [CartController::class, 'updateCartItemQuantity']);
+
+    //send selected cart items 
+    Route::post('/select-items', [CartController::class, 'selectItems']);
 });
