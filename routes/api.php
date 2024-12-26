@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ItemController;
 
 // Include authentication routes
 Route::prefix('auth')->group(function () {
@@ -16,6 +15,11 @@ Route::prefix('items')->group(function () {
 // Include cart routes
 Route::prefix('cart')->group(function () {
     require base_path('routes/cart.php');
+});
+
+// Include order routes
+Route::prefix('order')->group(function () {
+    require base_path('routes/order.php');
 });
 
 Route::get('/status', function () {
