@@ -129,32 +129,33 @@ class CartController extends Controller
     }
 
 
-    public function updateCartItemQuantity(Request $request){
+    public function updateCartItemQuantity(Request $request)
+    {
         $request->validate([
             'item_id' => 'required|exists:items,id',
             'quantity' => 'required|integer|min:1',
         ]);
-    
+
         if (!Auth::check()) {
             return response()->json([
                 'message' => 'You must be logged in to update the cart item quantity.'
             ], 401);
         }
-    
+
         $user = Auth::user();
-    
+
         $cart = Cart::where('user_id', $user->id)->first();
-    
+
         if (!$cart) {
             return response()->json([
                 'message' => 'No cart found for this user.'
             ], 404);
         }
-    
+
         $cartItem = CartItem::where('cart_id', $cart->id)
             ->where('item_id', $request->item_id)
             ->first();
-    
+
         if (!$cartItem) {
             return response()->json([
                 'message' => 'Item not found in the cart.'
@@ -162,46 +163,83 @@ class CartController extends Controller
         }
 
         //Update the quantity
-        $cartItem->quantity=$request->quantity;
+        $cartItem->quantity = $request->quantity;
         $cartItem->save();
 
         return response()->json([
-            'message'=>'Cart item quantity updated successfully',
-            'cartItem'=>$cartItem
-        ],200);
+            'message' => 'Cart item quantity updated successfully',
+            'cartItem' => $cartItem
+        ], 200);
     }
 
-    public function selectItems(Request $request){
+    public function selectItems(Request $request)
+    {
         if (!auth()->check()) {
             return response()->json([
                 'message' => 'You must be logged in to select cart items.'
             ], 401);
         }
-    
+
         // Check if the user has a cart
         $cart = $request->user()->cart;
-        
+
         if (!$cart) {
             return response()->json([
                 'message' => 'You do not have a cart.'
             ], 400);
         }
-        
+
         $request->validate([
-            'cart_item_ids'=>'required|array',
-            'cart_item_ids.*'=>'exists:cart_items,id',
+            'cart_item_ids' => 'required|array',
+            'cart_item_ids.*' => 'exists:cart_items,id',
         ]);
 
         //Mark all cart items for the current user as not selected
-        CartItem::where('cart_id',$request->user()->cart->id)
-        ->update(['selected'=>false]);
+        CartItem::where('cart_id', $request->user()->cart->id)
+            ->update(['selected' => false]);
 
         //update selected status for the provided cart items
-        CartItem::whereIn('id',$request->cart_item_ids)
-        ->update(['selected'=>true]);
+        CartItem::whereIn('id', $request->cart_item_ids)
+            ->update(['selected' => true]);
 
         return response()->json([
-            'message'=>'Items selected successfully'
-        ],201);
+            'message' => 'Items selected successfully'
+        ], 201);
     }
+
+    public function fetchCheckoutItems(Request $request)
+    {
+        $cart = $request->user()->cart;
+
+        if (!$cart) {
+            return response()->json(['message' => 'Your cart is empty.'], 400);
+        }
+
+        $selectedItems = CartItem::with('item') 
+            ->where('cart_id', $cart->id)
+            ->where('selected', true)
+            ->get();
+
+        if ($selectedItems->isEmpty()) {
+            return response()->json(['message' => 'No items selected for checkout.'], 400);
+        }
+
+        // Calculate order summary
+        $subtotal = $selectedItems->sum(function ($item) {
+            return $item->quantity * $item->item->item_price;
+        });
+
+        $discount = 0; 
+        $total = $subtotal - $discount;
+
+        return response()->json([
+            'selected_items' => $selectedItems,
+            'order_summary' => [
+                'subtotal' => $subtotal,
+                'discount' => $discount,
+                'total' => $total,
+            ],
+        ]);
+    }
+
 }

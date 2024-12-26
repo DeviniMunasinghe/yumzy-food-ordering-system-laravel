@@ -18,4 +18,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     //send selected cart items 
     Route::post('/select-items', [CartController::class, 'selectItems']);
+
+    //fetch selected cart items for checkout with order summary 
+    Route::get('/checkout-items', [CartController::class, 'fetchCheckoutItems']);
 });
