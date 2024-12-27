@@ -8,4 +8,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     //remove selected items from checkout
     Route::post('/remove-selected-items', [OrderController::class, 'removeSelectedItems']);
 
+    //place an order
+    Route::post('/place', [OrderController::class, 'placeOrder']);
+
 });
