@@ -283,7 +283,37 @@ class OrderController extends Controller
         'message'=>'Order status updated successfully',
         'order'=>$order
     ],201);
+    }
+
+    public function getOrderStatusCount(){
+        // Ensure the user is authenticated and has the correct role
+    if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
+        return response()->json([
+            'message' => 'Forbidden'
+        ], 403);
+    }
+
+    //Fetch counts for each order status
+    $statusCounts=Order::where('is_deleted',false)
+    ->selectRaw('order_status,COUNT(*) as count')
+    ->groupBy('order_status')
+    ->pluck('count','order_status');
+
+    //Get the total order count
+    $totalOrders=Order::where('is_deleted',false)->count();
 
 
+    //format the response
+    $response=[
+        'total_orders'=>$totalOrders,
+        'pending'=>$statusCounts['Pending']?? 0,
+        'successful'=>$statusCounts['Successful']?? 0,
+        'failed'=>$statusCounts['Failed']?? 0,
+    ];
+
+    return response()->json([
+        'message'=>'Order status count retrieved successfully.',
+        'data'=>$response
+    ],200);
     }
 }
