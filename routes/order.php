@@ -14,4 +14,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     //get all orders
     Route::get('/get-all', [OrderController::class, 'getAllOrders']);
 
+     //get an order by id
+     Route::get('/get-order/{id}', [OrderController::class, 'getOrderById']);
+
 });

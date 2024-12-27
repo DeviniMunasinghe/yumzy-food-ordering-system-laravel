@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\OrderItem;
-use App\Models\Item;
 
 class OrderController extends Controller
 {
@@ -181,5 +180,47 @@ class OrderController extends Controller
             'message' => 'orders retrieved successfully',
             'orders' => $ordersWithItems
         ], 200);
+    }
+
+    //view order  by id
+    public function getOrderById($id){
+         //check if the user is authenticated and has the correct role
+         if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
+            return response()->json([
+                'message' => 'Forbidden'
+            ], 403);
+        }
+
+        //find the item by id and ensure it is not deleted
+        $order = Order::where('id', $id)
+            ->where('is_deleted', false)
+            ->with('items:item_name')
+            ->first();
+
+        if (!$order) {
+            return response()->json([
+                'message' => 'order not found'
+            ], 404);
+        }
+
+         // Format the response to include item names
+         $formattedOrder = [
+                'order_id' => $order->id,
+                'order_date' => $order->order_date,
+                'total_amount' => $order->total_amount,
+                'order_status' => $order->order_status,
+                'items' => $order->items->map(function ($item) {
+                    return [
+                        'item_name' => $item->item_name,
+                    ];
+                }),
+            ];
+        
+
+        return response()->json([
+            'message' => 'Order retrieved successfully',
+            'item' => $formattedOrder
+        ], 200);
+
     }
 }
