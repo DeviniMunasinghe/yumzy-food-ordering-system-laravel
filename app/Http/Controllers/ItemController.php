@@ -57,6 +57,7 @@ class ItemController extends Controller
 
     }
 
+    //fetch all items
     public function index()
     {
 

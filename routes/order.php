@@ -11,4 +11,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     //place an order
     Route::post('/place', [OrderController::class, 'placeOrder']);
 
+    //get all orders
+    Route::get('/get-all', [OrderController::class, 'getAllOrders']);
+
 });

@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\OrderItem;
+use App\Models\Item;
 
 class OrderController extends Controller
 {
@@ -147,5 +148,38 @@ class OrderController extends Controller
                 'message' => 'Failed to place the order.Please try again.'
             ], 401);
         }
+    }
+
+    public function getAllOrders(Request $request)
+    {
+        // Check if the user is authenticated and has the correct role
+        if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+
+        //fetch all items where is_deleted=0
+        $orders = Order::where('is_deleted', false)
+            ->with('items:item_name')
+            ->get();
+
+        // Format the response to include item names
+        $ordersWithItems = $orders->map(function ($order) {
+            return [
+                'order_id' => $order->id,
+                'order_date' => $order->order_date,
+                'total_amount' => $order->total_amount,
+                'order_status' => $order->order_status,
+                'items' => $order->items->map(function ($item) {
+                    return [
+                        'item_name' => $item->item_name,
+                    ];
+                }),
+            ];
+        });
+
+        return response()->json([
+            'message' => 'orders retrieved successfully',
+            'orders' => $ordersWithItems
+        ], 200);
     }
 }
