@@ -16,4 +16,9 @@ class Order extends Model
         'final_amount',
         'is_deleted',
     ];
+
+    public function items()
+    {
+        return $this->belongsToMany(Item::class, 'order_items', 'order_id', 'item_id');
+    }
 }
