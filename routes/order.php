@@ -23,4 +23,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     //update order status by id
     Route::put('/update-status/{id}', [OrderController::class, 'updateOrderStatus']);
 
+    //get an order status count
+    Route::get('/status-count', [OrderController::class, 'getOrderStatusCount']);
 });
