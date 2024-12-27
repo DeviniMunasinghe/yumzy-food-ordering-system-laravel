@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\OrderController;
 
 Route::middleware(['auth:sanctum'])->group(function () {
-    
+
     //remove selected items from checkout
     Route::post('/remove-selected-items', [OrderController::class, 'removeSelectedItems']);
 
@@ -14,7 +14,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
     //get all orders
     Route::get('/get-all', [OrderController::class, 'getAllOrders']);
 
-     //get an order by id
-     Route::get('/get-order/{id}', [OrderController::class, 'getOrderById']);
+    //get an order by id
+    Route::get('/get-order/{id}', [OrderController::class, 'getOrderById']);
+
+    //delete an order by id
+    Route::delete('/delete-order/{id}', [OrderController::class, 'deleteOrder']);
 
 });

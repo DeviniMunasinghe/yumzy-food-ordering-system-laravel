@@ -191,7 +191,7 @@ class OrderController extends Controller
             ], 403);
         }
 
-        //find the item by id and ensure it is not deleted
+        //find the order by id and ensure it is not deleted
         $order = Order::where('id', $id)
             ->where('is_deleted', false)
             ->with('items:item_name')
@@ -222,5 +222,32 @@ class OrderController extends Controller
             'item' => $formattedOrder
         ], 200);
 
+    }
+
+    public function deleteOrder($id){
+        //check if the user is authenticated and has the correct role
+        if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
+            return response()->json([
+                'message' => 'Forbidden'
+            ], 403);
+        }
+
+        //find the order by id 
+        $order = Order::find($id);
+
+        if (!$order) {
+            return response()->json([
+                'message' => 'Order not found'
+            ], 404);
+        }
+
+        //set the order as deleted
+        $order->is_deleted = true;
+        $order->save();
+
+        return response()->json([
+            'message' => 'Item marked as deleted successfully',
+            'item' => $order
+        ], 200);
     }
 }
