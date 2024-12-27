@@ -20,4 +20,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     //delete an order by id
     Route::delete('/delete-order/{id}', [OrderController::class, 'deleteOrder']);
 
+    //update order status by id
+    Route::put('/update-status/{id}', [OrderController::class, 'updateOrderStatus']);
+
 });

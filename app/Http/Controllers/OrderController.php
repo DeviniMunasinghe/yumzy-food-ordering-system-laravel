@@ -250,4 +250,40 @@ class OrderController extends Controller
             'item' => $order
         ], 200);
     }
+
+    public function updateOrderStatus(Request $request,$id){
+    // Check if the user is authenticated and has the correct role
+    if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
+        return response()->json([
+            'message' => 'Forbidden'
+        ], 403);
+    }
+
+    //validate the request input
+    $request->validate([
+        'order_status'=>'required|string|in:pending,successful,failed'
+    ]);
+
+    //Find the order by id and ensure it is not deleted
+    $order=Order::where('id',$id)
+    ->where('is_deleted',false)
+    ->first();
+
+    if(!$order){
+        return response()->json([
+            'message'=>'Order not found'
+        ],404);
+    }
+
+    //update the order status
+    $order->order_status=$request->order_status;
+    $order->save();
+
+    return response ()->json([
+        'message'=>'Order status updated successfully',
+        'order'=>$order
+    ],201);
+
+
+    }
 }
