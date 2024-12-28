@@ -12,6 +12,7 @@ use App\Models\OrderItem;
 
 class OrderController extends Controller
 {
+    //remove selected items from checkout
     public function removeSelectedItems(Request $request)
     {
         // Ensure the user is logged in
@@ -47,6 +48,8 @@ class OrderController extends Controller
             'message' => 'Selected items have been removed from checkout successfully.'
         ], 200);
     }
+    
+    //place an order
     public function placeOrder(Request $request)
     {
         $request->validate([
@@ -149,6 +152,7 @@ class OrderController extends Controller
         }
     }
 
+    //get all orders for an admin
     public function getAllOrders(Request $request)
     {
         // Check if the user is authenticated and has the correct role
@@ -224,6 +228,7 @@ class OrderController extends Controller
 
     }
 
+    //delete an order
     public function deleteOrder($id){
         //check if the user is authenticated and has the correct role
         if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
@@ -251,6 +256,7 @@ class OrderController extends Controller
         ], 200);
     }
 
+    //update the order status
     public function updateOrderStatus(Request $request,$id){
     // Check if the user is authenticated and has the correct role
     if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
@@ -285,6 +291,7 @@ class OrderController extends Controller
     ],201);
     }
 
+    //get the order count according to the order status with total orders count
     public function getOrderStatusCount(){
         // Ensure the user is authenticated and has the correct role
     if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
@@ -317,6 +324,7 @@ class OrderController extends Controller
     ],200);
     }
 
+    //get the order status percentage
     public function getOrderStatusPercentage(){
         //Ensure the user is authenticated and has the correct role
         if(!Auth::check()|| !(Auth::user()->role=='admin'||Auth::user()->role=='super_admin')){
@@ -349,4 +357,54 @@ class OrderController extends Controller
             'data'=>$response
         ],201);
     }
+
+    public function getWeeklyOrderSummary()
+    {
+     // Ensure the user is authenticated and has the correct role
+     if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
+        return response()->json([
+            'message' => 'Forbidden'
+        ], 403);
+    }
+
+    // Calculate start date for the last 4 weeks
+    $today = now();
+    $startDate = $today->copy()->subWeeks(4)->startOfWeek();
+
+    // Fetch orders for last 4 weeks with their categories
+    $weeklySummary = OrderItem::selectRaw("
+        FLOOR(DATEDIFF(orders.order_date, ?) / 7) + 1 as week_number,
+        categories.category_name as category_name,
+        COUNT(order_items.id) as count
+    ", [$startDate])
+        ->join('orders', 'orders.id', '=', 'order_items.order_id')
+        ->join('items', 'items.id', '=', 'order_items.item_id')
+        ->join('categories', 'categories.id', '=', 'items.category_id')
+        ->where('orders.order_status', 'Successful')
+        ->where('orders.order_date', '>=', $startDate)
+        // Group only by week_number and category_name to avoid referencing non-grouped columns
+        ->groupByRaw('week_number, categories.category_name')
+        ->orderBy('week_number', 'asc')
+        ->get()
+        ->groupBy('week_number');
+
+    // Format the response
+    $response = [];
+    foreach ($weeklySummary as $weekNumber => $data) {
+        $categories = $data->mapWithKeys(function ($item) {
+            return [$item->category_name => $item->count];
+        });
+
+        $response[] = [
+            'week' => "Week $weekNumber",
+            'categories' => $categories,
+        ];
+    }
+
+    return response()->json([
+        'message' => 'Weekly order summary retrieved successfully.',
+        'data' => $response
+    ], 200);
+
+}
 }
