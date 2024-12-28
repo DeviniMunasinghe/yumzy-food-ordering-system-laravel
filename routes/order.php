@@ -28,4 +28,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     //get an order status count percentage
     Route::get('/status-percentage', [OrderController::class, 'getOrderStatusPercentage']);
+
+     //get weekly order summary
+     Route::get('/weekly-summary', [OrderController::class, 'getWeeklyOrderSummary']);
 });
