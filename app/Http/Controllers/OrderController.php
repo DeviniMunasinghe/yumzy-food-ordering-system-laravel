@@ -316,4 +316,37 @@ class OrderController extends Controller
         'data'=>$response
     ],200);
     }
+
+    public function getOrderStatusPercentage(){
+        //Ensure the user is authenticated and has the correct role
+        if(!Auth::check()|| !(Auth::user()->role=='admin'||Auth::user()->role=='super_admin')){
+            return response()->json([
+                'message'=>'Forbidden'
+            ],403);
+        }
+
+        //Fetch counts for each order status
+        $statusCounts=Order::where('is_deleted',false)
+        ->selectRaw('order_status,COUNT(*) as count')
+        ->groupBy('order_status')
+        ->pluck('count','order_status');
+
+        //Get the total order count
+        $totalOrders=Order::where('is_deleted',false)->count();
+
+        //format the response with percentage
+        $response=[
+            'total_orders'=>$totalOrders,
+            'percentages'=>[
+                'pending'=>$totalOrders>0 ? round(($statusCounts['Pending'] ?? 0)/$totalOrders*100,2):0,
+                'successful'=>$totalOrders>0 ? round(($statusCounts['Successful'] ?? 0)/$totalOrders*100,2):0,
+                'failed'=>$totalOrders>0 ? round(($statusCounts['Failed'] ?? 0)/$totalOrders*100,2):0
+            ]
+        ];
+
+        return response()->json([
+            'message'=>'Order status percentages retrieved successfully.',
+            'data'=>$response
+        ],201);
+    }
 }
