@@ -22,6 +22,11 @@ Route::prefix('order')->group(function () {
     require base_path('routes/order.php');
 });
 
+// Include feedback routes
+Route::prefix('feedback')->group(function () {
+    require base_path('routes/feedback.php');
+});
+
 Route::get('/status', function () {
     return response()->json(['status' => 'API is running'], 200);
 });
