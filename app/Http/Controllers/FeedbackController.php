@@ -20,14 +20,14 @@ class FeedbackController extends Controller
             'contact_number' => 'required|string|max:15',
             'message' => 'required|string',
         ]);
-    
+
         try {
             // Send the feedback to the company email
             Mail::to('yumzyfooddealer@gmail.com')->send(new FeedbackReceived($validatedData));
-    
+
             // Send the acknowledgment email to the user
             Mail::to($validatedData['email'])->send(new FeedbackAcknowledgment($validatedData));
-    
+
             // Return success response
             return response()->json([
                 'message' => 'Feedback submitted successfully. You will receive a confirmation email shortly.',
@@ -35,7 +35,7 @@ class FeedbackController extends Controller
         } catch (\Exception $e) {
             // Log the error for debugging
             Log::error('Error sending feedback email: ' . $e->getMessage());
-    
+
             // Return error response
             return response()->json([
                 'message' => 'There was an error submitting your feedback.',

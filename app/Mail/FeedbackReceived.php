@@ -27,7 +27,7 @@ class FeedbackReceived extends Mailable
 
         // Send raw plain text content directly to the email
         return $this->from('yumzyfooddealer@gmail.com')
-                    ->subject('New Feedback Received')
-                    ->text($content);  // Send raw text content
+            ->subject('New Feedback Received')
+            ->text($content);  // Send raw text content
     }
 }
