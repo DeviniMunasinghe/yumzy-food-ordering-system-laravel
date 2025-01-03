@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\OrderItem;
+use App\Models\Promotion;
 
 class OrderController extends Controller
 {
@@ -87,13 +88,30 @@ class OrderController extends Controller
             ], 403);
         }
 
-        //calculate order totals
+        //calculate order sub totals
         $subtotal = $selectedItems->sum(function ($item) {
             return $item->quantity * $item->item->item_price;
         });
 
         $discount = 0;//set as default
-        $finalAmount = $subtotal - $discount;
+        $categoryList = $selectedItems->pluck('item.category')->unique()->toArray();
+
+        $promotions = Promotion::where('start_date', '<=', now())
+            ->where('end_date', '>=', now())
+            ->with('rules')
+            ->get();
+    
+        foreach ($promotions as $promotion) {
+            if (in_array($promotion->categories, $categoryList)) {
+                foreach ($promotion->rules as $rule) {
+                    if ($subtotal >= $rule->min_price) {
+                        $discount = max($discount, $rule->discount_percentage);
+                    }
+                }
+            }
+        }
+    
+        $finalAmount = $subtotal - ($subtotal * $discount) / 100;
 
         DB::beginTransaction();
 
