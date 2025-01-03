@@ -45,7 +45,7 @@ class ItemController extends Controller
             'item_name' => $request->item_name,
             'item_description' => $request->item_description,
             'item_price' => $request->item_price,
-            'item_image' => $request->imagePath,
+            'item_image' => $imagePath,
             'category_id' => $category->id,
             'is_deleted' => false,
         ]);
