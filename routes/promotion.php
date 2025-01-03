@@ -12,3 +12,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/get-all', [PromotionController::class, 'getAllPromotions']);
 });
+
+//get promotion by id
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('/get/{id}', [PromotionController::class, 'getPromotionById']);
+});
