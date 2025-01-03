@@ -57,6 +57,7 @@ class ItemController extends Controller
 
     }
 
+    //fetch all items
     public function index()
     {
 
@@ -76,6 +77,7 @@ class ItemController extends Controller
         ], 200);
     }
 
+    //view item by id
     public function show($id)
     {
         //check if the user is authenticated and has the correct role

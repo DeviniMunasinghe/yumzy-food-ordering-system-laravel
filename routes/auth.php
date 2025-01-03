@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
@@ -33,3 +34,15 @@ Route::middleware(['auth:sanctum'])->post('/email/verification-notification', [E
 // route to handle authenticated user logout(using 'auth:sanctum' middleware)
 Route::middleware(['auth:sanctum'])->post('/logout', [AuthenticatedSessionController::class, 'destroy'])
     ->name('auth.logout');
+
+// Route to add a new admin (only accessible to super admin, using 'auth:sanctum' middleware)
+Route::middleware(['auth:sanctum'])->post('/add-admin', [AdminController::class, 'addAdmin'])->name('admin.add');
+
+//Route to delete an admin(only super admin can)
+Route::middleware(['auth:sanctum'])->delete('/delete-admin/{id}', [AdminController::class, 'deleteAdmin'])->name('admin.delete');
+
+//Route to get all admins(only super admin and admin can)
+Route::middleware(['auth:sanctum'])->get('/get-all-admins', [AdminController::class, 'getAllAdmins'])->name('admin.get');
+
+//Route to get an admin(only super admin can)
+Route::middleware(['auth:sanctum'])->get('/get-admin/{id}', [AdminController::class, 'getAdminById'])->name('admin.get');

@@ -24,7 +24,12 @@ class User extends Authenticatable implements MustVerifyEmail
         'email',
         'username',
         'password',
-        'role', 
+        'role',
+        'user_image',
+        'phone_no',
+        'address',
+        'first_name',
+        'last_name', 
     ];
 
     /**
@@ -53,5 +58,10 @@ class User extends Authenticatable implements MustVerifyEmail
     public function sendPasswordResetNotification($url)
     {
         $this->notify(new \App\Notifications\CustomPasswordResetNotification($url));
+    }
+
+    public function cart()
+    {
+        return $this->hasOne(Cart::class);
     }
 }
