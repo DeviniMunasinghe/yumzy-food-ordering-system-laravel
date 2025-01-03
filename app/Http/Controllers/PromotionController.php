@@ -40,7 +40,7 @@ class PromotionController extends Controller
             ]);
 
             //Add rules if provided
-            if (!empty($validateData['rules'])) {
+            if (!empty($validatedData['rules'])) {
                 foreach ($validatedData['rules'] as $rule) {
                     PromotionRule::create([
                         'promotion_id' => $promotion->id,
@@ -153,6 +153,32 @@ class PromotionController extends Controller
                 'message' => 'Error applying promotion',
                 'error' => $e->getMessage(),
             ], 500);
+        }
+    }
+
+    //delete a promotion by id
+    public function deletePromotionById($id){
+        try{
+            //find the promotion by id
+            $promotion = Promotion :: find($id);
+
+            if(!$promotion){
+                return response()->json([
+                    'message'=>'Promotion not found',
+                ],404);
+            }
+
+            //Delete the promotion
+            $promotion->delete();
+
+            return response()->json([
+                'message'=>'Promotion deleted successfully',
+            ],200);
+        }catch(\Exception $e){
+            return response()->json([
+                'message'=>'Error deleting promotion',
+                'error'=>$e->getMessage(),
+            ],500);
         }
     }
 
