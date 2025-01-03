@@ -62,4 +62,26 @@ class PromotionController extends Controller
 
     }
 
+    //get all promotions
+    public function getAllPromotions(){
+        try{
+            $currentDate=now();
+            $promotions=Promotion::where('start_date','<=',$currentDate)
+            ->where('end_date','>=',$currentDate)
+            ->with('rules')
+            ->get();
+
+            return response()->json([
+                'message'=>'Available promotions retrieved successfully',
+                'promotions'=>$promotions
+            ],201);
+        }catch(\Exception $e){
+            return response()->json([
+                'message'=>'Error retrieving promotions',
+                'error'=>$e->getMessage(),
+            ],500);
+        }
+
+    }
+
 }

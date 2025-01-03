@@ -7,3 +7,8 @@ use App\Http\Controllers\PromotionController;
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/add-new', [PromotionController::class, 'addPromotion']);
 });
+
+//get all promotions
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('/get-all', [PromotionController::class, 'getAllPromotions']);
+});
