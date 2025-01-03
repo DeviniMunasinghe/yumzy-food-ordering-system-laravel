@@ -22,3 +22,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/apply', [PromotionController::class, 'applyPromotion']);
 });
+
+//delete promotion by id
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::delete('/delete/{id}', [PromotionController::class, 'deletePromotionById']);
+});
