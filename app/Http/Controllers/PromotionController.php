@@ -84,4 +84,27 @@ class PromotionController extends Controller
 
     }
 
+    public function getPromotionById($id){
+        try{
+            $promotion = Promotion :: with('rules')->find($id);
+
+            if(!$promotion){
+                return response()->json([
+                    'message'=>'promotion not found',
+                ],404);
+            }
+
+            return response()->json([
+                'message'=>'Promotion retrieved successfully',
+                'promotion'=>$promotion,
+            ],200);
+            
+        }catch(\Exception $e){
+            return response()->json([
+                'message'=>'Error retrieving promotion',
+                'error'=>$e->getMessage(),     
+            ],500);
+        }
+    }
+
 }
