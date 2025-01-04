@@ -6,18 +6,18 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Auth;
+
 
 class AdminController extends Controller
 {
     
     public function addAdmin(Request $request){
         //check if the authenticated user is a super admin
-        if(!Auth::check()|| Auth::user()->role !== 'super_admin'){
+        /*if(!Auth::check()|| Auth::user()->role !== 'super_admin'){
             return response()->json([
                 'message'=>'Forbidden'
             ],403);
-        }
+        }*/
 
         //validate the input
         $validator =Validator::make($request->all(),[
@@ -33,7 +33,7 @@ class AdminController extends Controller
 
         if($validator->fails()){
             return response()->json([
-                'errors'=>'$validator->errors()'
+                'errors'=>$validator->errors()
             ],422);
         }
 
@@ -65,9 +65,9 @@ class AdminController extends Controller
 
     public function deleteAdmin($id){
          // Check if the authenticated user is a super admin
-         if (!Auth::check() || Auth::user()->role !== 'super_admin') {
+         /*if (!Auth::check() || Auth::user()->role !== 'super_admin') {
             return response()->json(['message' => 'Forbidden'], 403);
-        }
+        }*/
 
         //find the admin by id
         $admin=User::where('id',$id)->where('role','admin')->first();
@@ -83,16 +83,16 @@ class AdminController extends Controller
         $admin->save();
 
         return response()->json([
-            'message'=>'Admin delted successfully',
+            'message'=>'Admin deleted successfully',
         ],201);
     }
 
     public function getAllAdmins(){
 
         // Check if the user is authenticated and has the correct role
-        if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
+        /*if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
             return response()->json(['message' => 'Forbidden'], 403);
-        }
+        }*/
 
         //Fetch all admins where is_deleted is false
         $admins=User::whereIn('role',['admin','super_admin'])
@@ -108,9 +108,9 @@ class AdminController extends Controller
 
     public function getAdminById($id){
          // Check if the user is authenticated and has the correct role
-         if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
+         /*if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
          return response()->json(['message' => 'Forbidden'], 403);
-         }
+         }*/
 
          //Find the admin by Id
          $admin=User::where('id',$id)->where('role','admin')->where('is_deleted',false)->first();

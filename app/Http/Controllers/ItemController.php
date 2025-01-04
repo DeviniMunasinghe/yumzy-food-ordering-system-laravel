@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Item;
 use App\Models\Category;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class ItemController extends Controller
@@ -14,9 +13,9 @@ class ItemController extends Controller
     {
 
         // Check if the user has the correct role (admin or super_admin)
-        if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
+        /*if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
             return response()->json(['message' => 'Forbidden'], 403);
-        }
+        }*/
 
         //validate inputs
         $validator = Validator::make($request->all(), [
@@ -62,9 +61,9 @@ class ItemController extends Controller
     {
 
         // Check if the user is authenticated and has the correct role
-        if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
+        /*if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
             return response()->json(['message' => 'Forbidden'], 403);
-        }
+        }*/
 
         //fetch all items where is_deleted=0
         $items = Item::where('is_deleted', false)
@@ -81,11 +80,11 @@ class ItemController extends Controller
     public function show($id)
     {
         //check if the user is authenticated and has the correct role
-        if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
+        /*if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
             return response()->json([
                 'message' => 'Forbidden'
             ], 403);
-        }
+        }*/
 
         //find the item by id and ensure it is not deleted
         $item = Item::where('id', $id)
@@ -109,11 +108,11 @@ class ItemController extends Controller
     public function delete($id)
     {
         //check if the user is authenticated and has the correct role
-        if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
+        /*if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
             return response()->json([
                 'message' => 'Forbidden'
             ], 403);
-        }
+        }*/
 
         //find the item by id and ensure it exists
         $item = Item::find($id);
@@ -138,9 +137,9 @@ class ItemController extends Controller
     {
 
         // Check if the user is authenticated and has the correct role
-        if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
+        /*if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
             return response()->json(['message' => 'Forbidden'], 403);
-        }
+        }*/
 
         //validate the request data
         $validator = Validator::make($request->all(), [

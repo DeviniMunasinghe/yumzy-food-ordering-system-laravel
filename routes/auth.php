@@ -36,13 +36,13 @@ Route::middleware(['auth:sanctum'])->post('/logout', [AuthenticatedSessionContro
     ->name('auth.logout');
 
 // Route to add a new admin (only accessible to super admin, using 'auth:sanctum' middleware)
-Route::middleware(['auth:sanctum'])->post('/add-admin', [AdminController::class, 'addAdmin'])->name('admin.add');
+Route::middleware(['auth:sanctum', 'role:super_admin,admin'])->post('/add-admin', [AdminController::class, 'addAdmin'])->name('admin.add');
 
 //Route to delete an admin(only super admin can)
-Route::middleware(['auth:sanctum'])->delete('/delete-admin/{id}', [AdminController::class, 'deleteAdmin'])->name('admin.delete');
+Route::middleware(['auth:sanctum', 'role:super_admin'])->delete('/delete-admin/{id}', [AdminController::class, 'deleteAdmin'])->name('admin.delete');
 
 //Route to get all admins(only super admin and admin can)
-Route::middleware(['auth:sanctum'])->get('/get-all-admins', [AdminController::class, 'getAllAdmins'])->name('admin.get');
+Route::middleware(['auth:sanctum', 'role:admin,super_admin'])->get('/get-all-admins', [AdminController::class, 'getAllAdmins'])->name('admin.get');
 
 //Route to get an admin(only super admin can)
-Route::middleware(['auth:sanctum'])->get('/get-admin/{id}', [AdminController::class, 'getAdminById'])->name('admin.get');
+Route::middleware(['auth:sanctum', 'role:super_admin'])->get('/get-admin/{id}', [AdminController::class, 'getAdminById'])->name('admin.get');
