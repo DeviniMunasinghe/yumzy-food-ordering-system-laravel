@@ -174,9 +174,9 @@ class OrderController extends Controller
     public function getAllOrders(Request $request)
     {
         // Check if the user is authenticated and has the correct role
-        if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
+       /* if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
             return response()->json(['message' => 'Forbidden'], 403);
-        }
+        }*/
 
         //fetch all items where is_deleted=0
         $orders = Order::where('is_deleted', false)
@@ -207,11 +207,11 @@ class OrderController extends Controller
     //view order  by id
     public function getOrderById($id){
          //check if the user is authenticated and has the correct role
-         if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
+         /*if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
             return response()->json([
                 'message' => 'Forbidden'
             ], 403);
-        }
+        }*/
 
         //find the order by id and ensure it is not deleted
         $order = Order::where('id', $id)
@@ -249,11 +249,11 @@ class OrderController extends Controller
     //delete an order
     public function deleteOrder($id){
         //check if the user is authenticated and has the correct role
-        if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
+        /*if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
             return response()->json([
                 'message' => 'Forbidden'
             ], 403);
-        }
+        }*/
 
         //find the order by id 
         $order = Order::find($id);
@@ -277,11 +277,11 @@ class OrderController extends Controller
     //update the order status
     public function updateOrderStatus(Request $request,$id){
     // Check if the user is authenticated and has the correct role
-    if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
+    /*if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
         return response()->json([
             'message' => 'Forbidden'
         ], 403);
-    }
+    }*/
 
     //validate the request input
     $request->validate([
@@ -312,11 +312,11 @@ class OrderController extends Controller
     //get the order count according to the order status with total orders count
     public function getOrderStatusCount(){
         // Ensure the user is authenticated and has the correct role
-    if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
+    /*if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
         return response()->json([
             'message' => 'Forbidden'
         ], 403);
-    }
+    }*/
 
     //Fetch counts for each order status
     $statusCounts=Order::where('is_deleted',false)
@@ -345,11 +345,11 @@ class OrderController extends Controller
     //get the order status percentage
     public function getOrderStatusPercentage(){
         //Ensure the user is authenticated and has the correct role
-        if(!Auth::check()|| !(Auth::user()->role=='admin'||Auth::user()->role=='super_admin')){
+       /* if(!Auth::check()|| !(Auth::user()->role=='admin'||Auth::user()->role=='super_admin')){
             return response()->json([
                 'message'=>'Forbidden'
             ],403);
-        }
+        }*/
 
         //Fetch counts for each order status
         $statusCounts=Order::where('is_deleted',false)
@@ -379,11 +379,11 @@ class OrderController extends Controller
     public function getWeeklyOrderSummary()
     {
      // Ensure the user is authenticated and has the correct role
-     if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
+    /* if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
         return response()->json([
             'message' => 'Forbidden'
         ], 403);
-    }
+    }*/
 
     // Calculate start date for the last 4 weeks
     $today = now();
