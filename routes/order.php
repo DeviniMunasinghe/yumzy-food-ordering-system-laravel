@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\OrderController;
 
+//routes for user
 Route::middleware(['auth:sanctum'])->group(function () {
 
     //remove selected items from checkout
@@ -10,6 +11,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     //place an order
     Route::post('/place', [OrderController::class, 'placeOrder']);
+
+});
+
+//route for admin
+Route::middleware(['auth:sanctum', 'role:admin,super_admin'])->group(function () {
 
     //get all orders
     Route::get('/get-all', [OrderController::class, 'getAllOrders']);
