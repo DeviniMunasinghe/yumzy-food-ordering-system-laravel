@@ -30,3 +30,6 @@ Route::middleware(['auth:sanctum','role:super_admin,admin'])->group(function () 
 
 //get items by category
 Route::get('/category/{category_name}', [ItemController::class, 'getItemsByCategory']);
+
+//get top 3 items
+Route::get('/top-items', [ItemController::class, 'topItems']);
