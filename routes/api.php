@@ -33,6 +33,7 @@ Route::prefix('promotion')->group(function () {
 });
 
 
-Route::get('/status', function () {
-    return response()->json(['status' => 'API is running'], 200);
+// Include search routes
+Route::prefix('search')->group(function () {
+    require base_path('routes/search.php');
 });
