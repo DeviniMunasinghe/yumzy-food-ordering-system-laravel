@@ -9,7 +9,7 @@ class Item extends Model
 {
     use HasFactory;
 
-    protected $fillable =[
+    protected $fillable = [
         'item_name',
         'item_description',
         'item_price',
@@ -18,11 +18,12 @@ class Item extends Model
         'is_deleted',
     ];
 
-    protected $casts=[
-        'is_deleted'=>'boolean',
+    protected $casts = [
+        'is_deleted' => 'boolean',
     ];
 
-    public function category(){
+    public function category()
+    {
         return $this->belongsTo(Category::class);
     }
 }

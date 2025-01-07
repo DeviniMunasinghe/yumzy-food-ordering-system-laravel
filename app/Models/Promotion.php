@@ -9,7 +9,7 @@ class Promotion extends Model
 {
     use HasFactory;
 
-    protected $fillable=[
+    protected $fillable = [
         'title',
         'promotion_description',
         'promotion_image',
@@ -18,7 +18,8 @@ class Promotion extends Model
         'categories',
     ];
 
-    public function rules(){
+    public function rules()
+    {
         return $this->hasMany((PromotionRule::class));
     }
 }

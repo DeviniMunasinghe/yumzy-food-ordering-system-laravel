@@ -215,7 +215,7 @@ class CartController extends Controller
             return response()->json(['message' => 'Your cart is empty.'], 400);
         }
 
-        $selectedItems = CartItem::with('item') 
+        $selectedItems = CartItem::with('item')
             ->where('cart_id', $cart->id)
             ->where('selected', true)
             ->get();
@@ -229,7 +229,7 @@ class CartController extends Controller
             return $item->quantity * $item->item->item_price;
         });
 
-        $discount = 0; 
+        $discount = 0;
         $total = $subtotal - $discount;
 
         return response()->json([

@@ -157,28 +157,29 @@ class PromotionController extends Controller
     }
 
     //delete a promotion by id
-    public function deletePromotionById($id){
-        try{
+    public function deletePromotionById($id)
+    {
+        try {
             //find the promotion by id
-            $promotion = Promotion :: find($id);
+            $promotion = Promotion::find($id);
 
-            if(!$promotion){
+            if (!$promotion) {
                 return response()->json([
-                    'message'=>'Promotion not found',
-                ],404);
+                    'message' => 'Promotion not found',
+                ], 404);
             }
 
             //Delete the promotion
             $promotion->delete();
 
             return response()->json([
-                'message'=>'Promotion deleted successfully',
-            ],200);
-        }catch(\Exception $e){
+                'message' => 'Promotion deleted successfully',
+            ], 200);
+        } catch (\Exception $e) {
             return response()->json([
-                'message'=>'Error deleting promotion',
-                'error'=>$e->getMessage(),
-            ],500);
+                'message' => 'Error deleting promotion',
+                'error' => $e->getMessage(),
+            ], 500);
         }
     }
 

@@ -225,22 +225,23 @@ class ItemController extends Controller
     }
 
     //get top three items
-    public function topItems(Request $response){
-        $lastMonth=now()->subMonth();
+    public function topItems(Request $response)
+    {
+        $lastMonth = now()->subMonth();
 
-        $topItems=DB::table('order_items')
-        ->join('items','order_items.item_id','=','items.id')
-        ->join('orders','order_items.order_id','=','orders.id')
-        ->where('orders.created_at','>=',$lastMonth)
-        ->select('items.id','items.item_name','items.item_description',DB::raw('COUNT(order_items.item_id) as order_count'))
-        ->groupBy('items.id','items.item_name','items.item_description')
-        ->orderByDesc('order_count')
-        ->take(3)
-        ->get();
+        $topItems = DB::table('order_items')
+            ->join('items', 'order_items.item_id', '=', 'items.id')
+            ->join('orders', 'order_items.order_id', '=', 'orders.id')
+            ->where('orders.created_at', '>=', $lastMonth)
+            ->select('items.id', 'items.item_name', 'items.item_description', DB::raw('COUNT(order_items.item_id) as order_count'))
+            ->groupBy('items.id', 'items.item_name', 'items.item_description')
+            ->orderByDesc('order_count')
+            ->take(3)
+            ->get();
 
         return response()->json([
-            'message'=>'Top 3 items retrieved successfully.',
-            'data'=> $topItems,
-        ],200);
+            'message' => 'Top 3 items retrieved successfully.',
+            'data' => $topItems,
+        ], 200);
     }
 }

@@ -9,13 +9,14 @@ class PromotionRule extends Model
 {
     use HasFactory;
 
-    protected $fillable=[
+    protected $fillable = [
         'promotion_id',
         'min_price',
         'discount_percentage',
     ];
 
-    public function promotion(){
+    public function promotion()
+    {
         return $this->belongsTo(Promotion::class);
     }
 }
