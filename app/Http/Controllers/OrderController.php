@@ -49,7 +49,7 @@ class OrderController extends Controller
             'message' => 'Selected items have been removed from checkout successfully.'
         ], 200);
     }
-    
+
     //place an order
     public function placeOrder(Request $request)
     {
@@ -100,7 +100,7 @@ class OrderController extends Controller
             ->where('end_date', '>=', now())
             ->with('rules')
             ->get();
-    
+
         foreach ($promotions as $promotion) {
             if (in_array($promotion->categories, $categoryList)) {
                 foreach ($promotion->rules as $rule) {
@@ -110,7 +110,7 @@ class OrderController extends Controller
                 }
             }
         }
-    
+
         $finalAmount = $subtotal - ($subtotal * $discount) / 100;
 
         DB::beginTransaction();
@@ -174,9 +174,9 @@ class OrderController extends Controller
     public function getAllOrders(Request $request)
     {
         // Check if the user is authenticated and has the correct role
-       /* if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
-            return response()->json(['message' => 'Forbidden'], 403);
-        }*/
+        /* if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
+             return response()->json(['message' => 'Forbidden'], 403);
+         }*/
 
         //fetch all items where is_deleted=0
         $orders = Order::where('is_deleted', false)
@@ -205,13 +205,14 @@ class OrderController extends Controller
     }
 
     //view order  by id
-    public function getOrderById($id){
-         //check if the user is authenticated and has the correct role
-         /*if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
-            return response()->json([
-                'message' => 'Forbidden'
-            ], 403);
-        }*/
+    public function getOrderById($id)
+    {
+        //check if the user is authenticated and has the correct role
+        /*if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
+           return response()->json([
+               'message' => 'Forbidden'
+           ], 403);
+       }*/
 
         //find the order by id and ensure it is not deleted
         $order = Order::where('id', $id)
@@ -225,19 +226,19 @@ class OrderController extends Controller
             ], 404);
         }
 
-         // Format the response to include item names
-         $formattedOrder = [
-                'order_id' => $order->id,
-                'order_date' => $order->order_date,
-                'total_amount' => $order->total_amount,
-                'order_status' => $order->order_status,
-                'items' => $order->items->map(function ($item) {
-                    return [
-                        'item_name' => $item->item_name,
-                    ];
-                }),
-            ];
-        
+        // Format the response to include item names
+        $formattedOrder = [
+            'order_id' => $order->id,
+            'order_date' => $order->order_date,
+            'total_amount' => $order->total_amount,
+            'order_status' => $order->order_status,
+            'items' => $order->items->map(function ($item) {
+                return [
+                    'item_name' => $item->item_name,
+                ];
+            }),
+        ];
+
 
         return response()->json([
             'message' => 'Order retrieved successfully',
@@ -247,7 +248,8 @@ class OrderController extends Controller
     }
 
     //delete an order
-    public function deleteOrder($id){
+    public function deleteOrder($id)
+    {
         //check if the user is authenticated and has the correct role
         /*if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
             return response()->json([
@@ -275,154 +277,157 @@ class OrderController extends Controller
     }
 
     //update the order status
-    public function updateOrderStatus(Request $request,$id){
-    // Check if the user is authenticated and has the correct role
-    /*if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
+    public function updateOrderStatus(Request $request, $id)
+    {
+        // Check if the user is authenticated and has the correct role
+        /*if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
+            return response()->json([
+                'message' => 'Forbidden'
+            ], 403);
+        }*/
+
+        //validate the request input
+        $request->validate([
+            'order_status' => 'required|string|in:pending,successful,failed'
+        ]);
+
+        //Find the order by id and ensure it is not deleted
+        $order = Order::where('id', $id)
+            ->where('is_deleted', false)
+            ->first();
+
+        if (!$order) {
+            return response()->json([
+                'message' => 'Order not found'
+            ], 404);
+        }
+
+        //update the order status
+        $order->order_status = $request->order_status;
+        $order->save();
+
         return response()->json([
-            'message' => 'Forbidden'
-        ], 403);
-    }*/
-
-    //validate the request input
-    $request->validate([
-        'order_status'=>'required|string|in:pending,successful,failed'
-    ]);
-
-    //Find the order by id and ensure it is not deleted
-    $order=Order::where('id',$id)
-    ->where('is_deleted',false)
-    ->first();
-
-    if(!$order){
-        return response()->json([
-            'message'=>'Order not found'
-        ],404);
-    }
-
-    //update the order status
-    $order->order_status=$request->order_status;
-    $order->save();
-
-    return response ()->json([
-        'message'=>'Order status updated successfully',
-        'order'=>$order
-    ],201);
+            'message' => 'Order status updated successfully',
+            'order' => $order
+        ], 201);
     }
 
     //get the order count according to the order status with total orders count
-    public function getOrderStatusCount(){
+    public function getOrderStatusCount()
+    {
         // Ensure the user is authenticated and has the correct role
-    /*if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
-        return response()->json([
-            'message' => 'Forbidden'
-        ], 403);
-    }*/
-
-    //Fetch counts for each order status
-    $statusCounts=Order::where('is_deleted',false)
-    ->selectRaw('order_status,COUNT(*) as count')
-    ->groupBy('order_status')
-    ->pluck('count','order_status');
-
-    //Get the total order count
-    $totalOrders=Order::where('is_deleted',false)->count();
-
-
-    //format the response
-    $response=[
-        'total_orders'=>$totalOrders,
-        'pending'=>$statusCounts['Pending']?? 0,
-        'successful'=>$statusCounts['Successful']?? 0,
-        'failed'=>$statusCounts['Failed']?? 0,
-    ];
-
-    return response()->json([
-        'message'=>'Order status count retrieved successfully.',
-        'data'=>$response
-    ],200);
-    }
-
-    //get the order status percentage
-    public function getOrderStatusPercentage(){
-        //Ensure the user is authenticated and has the correct role
-       /* if(!Auth::check()|| !(Auth::user()->role=='admin'||Auth::user()->role=='super_admin')){
+        /*if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
             return response()->json([
-                'message'=>'Forbidden'
-            ],403);
+                'message' => 'Forbidden'
+            ], 403);
         }*/
 
         //Fetch counts for each order status
-        $statusCounts=Order::where('is_deleted',false)
-        ->selectRaw('order_status,COUNT(*) as count')
-        ->groupBy('order_status')
-        ->pluck('count','order_status');
+        $statusCounts = Order::where('is_deleted', false)
+            ->selectRaw('order_status,COUNT(*) as count')
+            ->groupBy('order_status')
+            ->pluck('count', 'order_status');
 
         //Get the total order count
-        $totalOrders=Order::where('is_deleted',false)->count();
+        $totalOrders = Order::where('is_deleted', false)->count();
+
+
+        //format the response
+        $response = [
+            'total_orders' => $totalOrders,
+            'pending' => $statusCounts['Pending'] ?? 0,
+            'successful' => $statusCounts['Successful'] ?? 0,
+            'failed' => $statusCounts['Failed'] ?? 0,
+        ];
+
+        return response()->json([
+            'message' => 'Order status count retrieved successfully.',
+            'data' => $response
+        ], 200);
+    }
+
+    //get the order status percentage
+    public function getOrderStatusPercentage()
+    {
+        //Ensure the user is authenticated and has the correct role
+        /* if(!Auth::check()|| !(Auth::user()->role=='admin'||Auth::user()->role=='super_admin')){
+             return response()->json([
+                 'message'=>'Forbidden'
+             ],403);
+         }*/
+
+        //Fetch counts for each order status
+        $statusCounts = Order::where('is_deleted', false)
+            ->selectRaw('order_status,COUNT(*) as count')
+            ->groupBy('order_status')
+            ->pluck('count', 'order_status');
+
+        //Get the total order count
+        $totalOrders = Order::where('is_deleted', false)->count();
 
         //format the response with percentage
-        $response=[
-            'total_orders'=>$totalOrders,
-            'percentages'=>[
-                'pending'=>$totalOrders>0 ? round(($statusCounts['Pending'] ?? 0)/$totalOrders*100,2):0,
-                'successful'=>$totalOrders>0 ? round(($statusCounts['Successful'] ?? 0)/$totalOrders*100,2):0,
-                'failed'=>$totalOrders>0 ? round(($statusCounts['Failed'] ?? 0)/$totalOrders*100,2):0
+        $response = [
+            'total_orders' => $totalOrders,
+            'percentages' => [
+                'pending' => $totalOrders > 0 ? round(($statusCounts['Pending'] ?? 0) / $totalOrders * 100, 2) : 0,
+                'successful' => $totalOrders > 0 ? round(($statusCounts['Successful'] ?? 0) / $totalOrders * 100, 2) : 0,
+                'failed' => $totalOrders > 0 ? round(($statusCounts['Failed'] ?? 0) / $totalOrders * 100, 2) : 0
             ]
         ];
 
         return response()->json([
-            'message'=>'Order status percentages retrieved successfully.',
-            'data'=>$response
-        ],201);
+            'message' => 'Order status percentages retrieved successfully.',
+            'data' => $response
+        ], 201);
     }
 
     public function getWeeklyOrderSummary()
     {
-     // Ensure the user is authenticated and has the correct role
-    /* if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
-        return response()->json([
-            'message' => 'Forbidden'
-        ], 403);
-    }*/
+        // Ensure the user is authenticated and has the correct role
+        /* if (!Auth::check() || !(Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
+            return response()->json([
+                'message' => 'Forbidden'
+            ], 403);
+        }*/
 
-    // Calculate start date for the last 4 weeks
-    $today = now();
-    $startDate = $today->copy()->subWeeks(4)->startOfWeek();
+        // Calculate start date for the last 4 weeks
+        $today = now();
+        $startDate = $today->copy()->subWeeks(4)->startOfWeek();
 
-    // Fetch orders for last 4 weeks with their categories
-    $weeklySummary = OrderItem::selectRaw("
+        // Fetch orders for last 4 weeks with their categories
+        $weeklySummary = OrderItem::selectRaw("
         FLOOR(DATEDIFF(orders.order_date, ?) / 7) + 1 as week_number,
         categories.category_name as category_name,
         COUNT(order_items.id) as count
     ", [$startDate])
-        ->join('orders', 'orders.id', '=', 'order_items.order_id')
-        ->join('items', 'items.id', '=', 'order_items.item_id')
-        ->join('categories', 'categories.id', '=', 'items.category_id')
-        ->where('orders.order_status', 'Successful')
-        ->where('orders.order_date', '>=', $startDate)
-        // Group only by week_number and category_name to avoid referencing non-grouped columns
-        ->groupByRaw('week_number, categories.category_name')
-        ->orderBy('week_number', 'asc')
-        ->get()
-        ->groupBy('week_number');
+            ->join('orders', 'orders.id', '=', 'order_items.order_id')
+            ->join('items', 'items.id', '=', 'order_items.item_id')
+            ->join('categories', 'categories.id', '=', 'items.category_id')
+            ->where('orders.order_status', 'Successful')
+            ->where('orders.order_date', '>=', $startDate)
+            // Group only by week_number and category_name to avoid referencing non-grouped columns
+            ->groupByRaw('week_number, categories.category_name')
+            ->orderBy('week_number', 'asc')
+            ->get()
+            ->groupBy('week_number');
 
-    // Format the response
-    $response = [];
-    foreach ($weeklySummary as $weekNumber => $data) {
-        $categories = $data->mapWithKeys(function ($item) {
-            return [$item->category_name => $item->count];
-        });
+        // Format the response
+        $response = [];
+        foreach ($weeklySummary as $weekNumber => $data) {
+            $categories = $data->mapWithKeys(function ($item) {
+                return [$item->category_name => $item->count];
+            });
 
-        $response[] = [
-            'week' => "Week $weekNumber",
-            'categories' => $categories,
-        ];
+            $response[] = [
+                'week' => "Week $weekNumber",
+                'categories' => $categories,
+            ];
+        }
+
+        return response()->json([
+            'message' => 'Weekly order summary retrieved successfully.',
+            'data' => $response
+        ], 200);
+
     }
-
-    return response()->json([
-        'message' => 'Weekly order summary retrieved successfully.',
-        'data' => $response
-    ], 200);
-
-}
 }

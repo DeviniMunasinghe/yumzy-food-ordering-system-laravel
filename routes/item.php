@@ -9,22 +9,22 @@ Route::middleware(['auth:sanctum', 'role:super_admin,admin'])->group(function ()
 });
 
 //get all items
-Route::middleware(['auth:sanctum','role:super_admin,admin'])->group(function () {
+Route::middleware(['auth:sanctum', 'role:super_admin,admin'])->group(function () {
     Route::get('/get-all', [ItemController::class, 'index']);
 });
 
 //get a specific item
-Route::middleware(['auth:sanctum','role:super_admin,admin'])->group(function () {
+Route::middleware(['auth:sanctum', 'role:super_admin,admin'])->group(function () {
     Route::get('/get-item/{id}', [ItemController::class, 'show']);
 });
 
 //delete a specific item by id
-Route::middleware(['auth:sanctum','role:super_admin,admin'])->group(function () {
+Route::middleware(['auth:sanctum', 'role:super_admin,admin'])->group(function () {
     Route::delete('/delete-item/{id}', [ItemController::class, 'delete']);
 });
 
 //update a specific item by id
-Route::middleware(['auth:sanctum','role:super_admin,admin'])->group(function () {
+Route::middleware(['auth:sanctum', 'role:super_admin,admin'])->group(function () {
     Route::put('/update-item/{id}', [ItemController::class, 'update']);
 });
 
